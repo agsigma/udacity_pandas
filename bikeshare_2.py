@@ -58,6 +58,14 @@ NUM_TO_DAY = {
 
 
 def input_options(options):
+    """
+    Ask users for input from predifined list of strings
+
+    Args:
+        (list<string>) options - list of options to select from
+    Returns:
+        (str) - string selected by user
+    """
     print('Options: {}'.format(', '.join(options)))
     s = input().lower()
     while s not in options:
