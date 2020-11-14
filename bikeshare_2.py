@@ -79,8 +79,10 @@ def get_filters():
     print('Select city: ')
     city = input_options(CITY_DATA.keys())
     # get user input for month (all, january, february, ... , june)
+    print('Select month (type all to include all month in analisys): ')
     month = input_options(MONTH_ENUM.keys())
     # get user input for day of week (all, monday, tuesday, ... sunday)
+    print('Select day of week (type all to include all month in analisys): ')
     day = input_options(DAY_ENUM.keys())
     print('-'*40)
     return city, month, day
@@ -208,8 +210,7 @@ def user_stats(df):
 
 def main():
     while True:
-        # city, month, day = get_filters()
-        city, month, day = ('chicago', 'january', 'all')
+        city, month, day = get_filters()
         df = load_data(city, month, day)
 
         time_stats(df)
@@ -226,7 +227,7 @@ def main():
             if show_raw == "no":
                 break
 
-        restart = input('\nWould you like to restart? Enter yes or no.\n')
+        print('\nWould you like to restart? Enter yes or no.\n')
         if input_options(['yes', 'no']) != 'yes':
             break
 
