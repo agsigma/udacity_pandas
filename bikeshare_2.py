@@ -2,9 +2,11 @@ import time
 import pandas as pd
 import numpy as np
 
-CITY_DATA = { 'chicago': 'chicago.csv',
-              'new york city': 'new_york_city.csv',
-              'washington': 'washington.csv' }
+CITY_DATA = { 
+    'chicago': 'chicago.csv',
+    'new york city': 'new_york_city.csv',
+    'washington': 'washington.csv' 
+}
 
 MONTH_ENUM = {
     'january': 1,
@@ -13,12 +15,6 @@ MONTH_ENUM = {
     'april': 4,
     'may': 5,
     'june': 6,
-    'july': 7,
-    'august': 8,
-    'september': 9,
-    'october': 10,
-    'november': 11,
-    'december': 12,
     'all': None
 }
 NUM_TO_MONTH = {
@@ -27,13 +23,7 @@ NUM_TO_MONTH = {
     3: 'march',
     4: 'april',
     5: 'may',
-    6: 'june',
-    7: 'july',
-    8: 'august',
-    9: 'september',
-    10: 'october',
-    11: 'november',
-    12: 'december',
+    6: 'june'
 }
 
 DAY_ENUM = {
@@ -59,7 +49,7 @@ NUM_TO_DAY = {
 
 def input_options(options):
     """
-    Ask users for input from predifined list of strings
+    Ask users for input from list of strings passed as parameter
 
     Args:
         (list<string>) options - list of options to select from
@@ -83,15 +73,19 @@ def get_filters():
         (str) day - name of the day of week to filter by, or "all" to apply no day filter
     """
     print('Hello! Let\'s explore some US bikeshare data!')
+
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     print('Select city: ')
     city = input_options(CITY_DATA.keys())
+
     # get user input for month (all, january, february, ... , june)
     print('Select month (type all to include all month in analisys): ')
     month = input_options(MONTH_ENUM.keys())
+
     # get user input for day of week (all, monday, tuesday, ... sunday)
     print('Select day of week (type all to include all month in analisys): ')
     day = input_options(DAY_ENUM.keys())
+    
     print('-'*40)
     return city, month, day
 
@@ -105,10 +99,12 @@ def load_data(city, month, day):
         (str) month - name of the month to filter by, or "all" to apply no month filter
         (str) day - name of the day of week to filter by, or "all" to apply no day filter
     Returns:
-        df - Pandas DataFrame containing city data filtered by month and day
+        df - Pandas DataFrame containing city data filtered by month and day and additional Timestamp, Month, Day of week and Hour columns
     """
+
     df = pd.read_csv(CITY_DATA[city])
     datetime_series = pd.to_datetime(df['Start Time'])
+
     df['Timestamp'] = datetime_series
     df['Month'] = df['Timestamp'].dt.month
     df['Day of week'] = df['Timestamp'].dt.dayofweek
@@ -194,23 +190,32 @@ def user_stats(df):
     start_time = time.time()
 
     # Display counts of user types
-    print('Types of users:')
-    user_values = df['User Type'].value_counts()
-    for user_type in user_values.keys():
-        print('{}: {}'.format(user_type, user_values[user_type]))
-    print()
+    if 'User Type' in df.columns:
+        print('Types of users:')
+        user_values = df['User Type'].value_counts()
+        for user_type in user_values.keys():
+            print('{}: {}'.format(user_type, user_values[user_type]))
+        print()
+    else:
+        print('No User Type data.')
     
     # Display counts of gender
-    print('Distribution of gender:')
-    gender_values = df['Gender'].value_counts()
-    for gender in gender_values.keys():
-        print('{}: {}'.format(gender, gender_values[gender]))
-    print()
+    if 'Gender' in df.columns:
+        print('Distribution of gender:')
+        gender_values = df['Gender'].value_counts()
+        for gender in gender_values.keys():
+            print('{}: {}'.format(gender, gender_values[gender]))
+        print()
+    else:
+        print('No Gender data.')
 
     # Display earliest, most recent, and most common year of birth
-    print( 'Oldest customer was born in: {}'.format(int( df['Birth Year'].min() )) )
-    print( 'Youngest customer was born in: {}'.format(int( df['Birth Year'].max() )) )
-    print( 'Most common birth year is: {}'.format(int( df['Birth Year'].mode()[0] )) )
+    if 'Birth Year' in df.columns:
+        print( 'Oldest customer was born in: {}'.format(int( df['Birth Year'].min() )) )
+        print( 'Youngest customer was born in: {}'.format(int( df['Birth Year'].max() )) )
+        print( 'Most common birth year is: {}'.format(int( df['Birth Year'].mode()[0] )) )
+    else:
+        print('No Birth Year data.')
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
