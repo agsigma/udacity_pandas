@@ -21,6 +21,20 @@ MONTH_ENUM = {
     'december': 12,
     'all': None
 }
+NUM_TO_MONTH = {
+    1: 'january',
+    2: 'february',
+    3: 'march',
+    4: 'april',
+    5: 'may',
+    6: 'june',
+    7: 'july',
+    8: 'august',
+    9: 'september',
+    10: 'october',
+    11: 'november',
+    12: 'december',
+}
 
 DAY_ENUM = {
     'monday': 0, 
@@ -32,13 +46,23 @@ DAY_ENUM = {
     'sunday': 6,
     'all': None
 }
+NUM_TO_DAY = {
+    0: 'monday', 
+    1: 'tuesday',
+    2: 'wednesday', 
+    3: 'thursday', 
+    4: 'friday',
+    5: 'saturday',
+    6: 'sunday'
+}
 
 
 def input_options(options):
-  s = input().lower()
-  while s not in options:
+    print('Options: {}'.format(', '.join(options)))
     s = input().lower()
-  return s
+    while s not in options:
+        s = input().lower()
+    return s
 
 
 def get_filters():
@@ -52,6 +76,7 @@ def get_filters():
     """
     print('Hello! Let\'s explore some US bikeshare data!')
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
+    print('Select city: ')
     city = input_options(CITY_DATA.keys())
     # get user input for month (all, january, february, ... , june)
     month = input_options(MONTH_ENUM.keys())
@@ -77,6 +102,7 @@ def load_data(city, month, day):
     df['Timestamp'] = datetime_series
     df['Month'] = df['Timestamp'].dt.month
     df['Day of week'] = df['Timestamp'].dt.dayofweek
+    df['Hour'] = df['Timestamp'].dt.hour
 
     if month != 'all':
         df = df[df['Month'] == MONTH_ENUM[month]]
@@ -94,14 +120,17 @@ def time_stats(df):
     start_time = time.time()
 
     # display the most common month
-
+    most_common_month = NUM_TO_MONTH[ df['Month'].mode()[0] ].title()
 
     # display the most common day of week
-
+    most_common_day_of_week = NUM_TO_DAY[ df['Day of week'].mode()[0] ].title()
 
     # display the most common start hour
+    most_common_start_hour = df['Hour'].mode()[0]
 
-
+    print('Most common month: {}'.format(most_common_month))
+    print('Most common day of week: {}'.format(most_common_day_of_week))
+    print('Most common start hour: {}'.format(most_common_start_hour))
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
@@ -139,10 +168,10 @@ def trip_duration_stats(df):
     start_time = time.time()
 
     # display total travel time
-
+    print( 'Sum of all trips durations is: {}'.format(df['Trip Duration'].sum()) )
 
     # display mean travel time
-
+    print( 'Mean trip durations is: {}'.format(df['Trip Duration'].mean()) )
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -155,13 +184,23 @@ def user_stats(df):
     start_time = time.time()
 
     # Display counts of user types
-
-
+    print('Types of users:')
+    user_values = df['User Type'].value_counts()
+    for user_type in user_values.keys():
+        print('{}: {}'.format(user_type, user_values[user_type]))
+    print()
+    
     # Display counts of gender
-
+    print('Distribution of gender:')
+    gender_values = df['Gender'].value_counts()
+    for gender in gender_values.keys():
+        print('{}: {}'.format(gender, gender_values[gender]))
+    print()
 
     # Display earliest, most recent, and most common year of birth
-
+    print( 'Oldest customer was born in: {}'.format(int( df['Birth Year'].min() )) )
+    print( 'Youngest customer was born in: {}'.format(int( df['Birth Year'].max() )) )
+    print( 'Most common birth year is: {}'.format(int( df['Birth Year'].mode()[0] )) )
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -169,19 +208,26 @@ def user_stats(df):
 
 def main():
     while True:
-        city, month, day = ('chicago', 'january', 'monday')  # get_filters()
+        # city, month, day = get_filters()
+        city, month, day = ('chicago', 'january', 'all')
         df = load_data(city, month, day)
 
-        # print(df)        
-        # print(df['Month'])        
-
-        # time_stats(df)
+        time_stats(df)
         station_stats(df)
-        # trip_duration_stats(df)
-        # user_stats(df)
+        trip_duration_stats(df)
+        user_stats(df)
+
+        print('Do you want to see raw data?')
+        show_raw = input_options(['yes', 'no'])
+        for i in range(0, df.size, 5):
+            print(df[i:i+5])
+            print('Do you want to see more raw data?')
+            show_raw = input_options(['yes', 'no'])
+            if show_raw == "no":
+                break
 
         restart = input('\nWould you like to restart? Enter yes or no.\n')
-        if restart.lower() != 'yes':
+        if input_options(['yes', 'no']) != 'yes':
             break
 
 
